@@ -2,15 +2,15 @@ package seven.belog.loans;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import seven.belog.loans.application.LoansService;
 
 @SpringBootApplication
 public class Main {
-    public static void main(String[] args) {
-        ApplicationContext context = SpringApplication.run(Main.class, args);
 
-        var aggregator = context.getBean(Aggregator.class);
-        var loans = aggregator.getAllLoans();
-        loans.forEach(System.out::println);
+    public static void main(String[] args) {
+        SpringApplication
+            .run(Main.class, args)
+            .getBean(LoansService.class)
+            .getUnitedLoan();
     }
 }

@@ -1,4 +1,4 @@
-package seven.belog.loans;
+package seven.belog.loans.infrastructure;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,22 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import seven.belog.loans.application.LoansQueryService;
+import seven.belog.loans.domain.Loan;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Service
-class Aggregator {
+@Component
+public class LoansQueryServiceImpl implements LoansQueryService {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final Logger logger = LoggerFactory.getLogger(Aggregator.class);
+    private final Logger logger = LoggerFactory.getLogger(LoansQueryServiceImpl.class);
 
-    public Aggregator(@Autowired JdbcTemplate jdbcTemplate) {
+    public LoansQueryServiceImpl(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
     public List<Loan> getAllLoans() {
         List<Loan> loans = List.of();
 
