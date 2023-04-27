@@ -36,6 +36,24 @@ public class PaymentCode implements Comparable<PaymentCode> {
         return String.valueOf(this.value);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof PaymentCode)) {
+            return false;
+        }
+
+        return this.value == ((PaymentCode) other).value;
+    }
+
+    @Override
+    public int hashCode() {
+        return badness;
+    }
+
     public static PaymentCode of(char value) {
         switch (value) {
             case '1':

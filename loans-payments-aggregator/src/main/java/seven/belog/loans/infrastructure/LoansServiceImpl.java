@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import seven.belog.loans.application.LoansQueryService;
+import seven.belog.loans.application.LoansRepository;
 import seven.belog.loans.application.LoansService;
 import seven.belog.loans.domain.Loan;
 import seven.belog.loans.domain.Payment;
@@ -17,33 +17,32 @@ import java.util.stream.Collectors;
 @Service
 public class LoansServiceImpl implements LoansService {
 
-    private final LoansQueryService queryService;
+    private final LoansRepository repository;
 
     private final Logger logger = LoggerFactory.getLogger(LoansServiceImpl.class);
 
-    public LoansServiceImpl(@Autowired LoansQueryService queryService) {
-        this.queryService = queryService;
+    public LoansServiceImpl(@Autowired LoansRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Loan getUnitedLoan() {
+    public Loan getUnitedLoan(SortedMap<LocalDate, PaymentCode> worstPayments) {
         logger.info("Counting united loan...");
 
-        SortedMap<LocalDate, PaymentCode> worstSummary = getWorstPaymentsSummary();
-
-        if (worstSummary.isEmpty()) {
+        if (worstPayments.isEmpty()) {
             return null;
         }
 
-        LocalDate startDate = worstSummary.firstKey();
+        LocalDate startDate = worstPayments.firstKey();
         LocalDate nextDate = startDate;
         StringBuilder payments = new StringBuilder();
 
-        for (Map.Entry<LocalDate, PaymentCode> entry: worstSummary.entrySet()) {
+        for (Map.Entry<LocalDate, PaymentCode> entry: worstPayments.entrySet()) {
             LocalDate date = entry.getKey();
             PaymentCode code = entry.getValue();
 
             if (!date.equals(nextDate)) {
+                // some dates are skipped -> filling gaps with 'X' code (no data)
                 var monthsSkipped = ChronoUnit.MONTHS.between(nextDate, date);
                 for (int i = 1; i <= monthsSkipped; i++) {
                     payments.append(PaymentCode.noData().getValue());
@@ -65,10 +64,10 @@ public class LoansServiceImpl implements LoansService {
     }
 
     @Override
-    public SortedMap<LocalDate, PaymentCode> getWorstPaymentsSummary() {
+    public SortedMap<LocalDate, PaymentCode> getWorstPaymentsSummary(SortedMap<LocalDate, List<PaymentCode>> allPayments) {
         SortedMap<LocalDate, PaymentCode> worstSummary = new TreeMap<>();
 
-        getAllPaymentsSummary().forEach((key, value) -> {
+        allPayments.forEach((key, value) -> {
             PaymentCode worstPayment = value.stream().max(PaymentCode::compareTo).orElseThrow(IllegalStateException::new);
             worstSummary.put(key, worstPayment);
         });
@@ -78,7 +77,7 @@ public class LoansServiceImpl implements LoansService {
 
     @Override
     public SortedMap<LocalDate, List<PaymentCode>> getAllPaymentsSummary() {
-        var allLoans = queryService.getAllLoans();
+        var allLoans = repository.getAllLoans();
 
         List<Payment> allPayments = allLoans
                 .stream()

@@ -8,9 +8,10 @@ import seven.belog.loans.application.LoansService;
 public class Main {
 
     public static void main(String[] args) {
-        SpringApplication
+        var service = SpringApplication
             .run(Main.class, args)
-            .getBean(LoansService.class)
-            .getUnitedLoan();
+            .getBean(LoansService.class);
+
+        service.getUnitedLoan(service.getWorstPaymentsSummary(service.getAllPaymentsSummary()));
     }
 }

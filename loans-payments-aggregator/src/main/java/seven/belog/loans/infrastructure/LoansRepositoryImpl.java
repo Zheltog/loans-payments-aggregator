@@ -6,21 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
-import seven.belog.loans.application.LoansQueryService;
+import org.springframework.stereotype.Repository;
+import seven.belog.loans.application.LoansRepository;
 import seven.belog.loans.domain.Loan;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component
-public class LoansQueryServiceImpl implements LoansQueryService {
+@Repository
+public class LoansRepositoryImpl implements LoansRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final Logger logger = LoggerFactory.getLogger(LoansQueryServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(LoansRepositoryImpl.class);
 
-    public LoansQueryServiceImpl(@Autowired JdbcTemplate jdbcTemplate) {
+    public LoansRepositoryImpl(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
